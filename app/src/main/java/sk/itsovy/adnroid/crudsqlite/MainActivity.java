@@ -13,8 +13,11 @@ import androidx.core.widget.NestedScrollView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -31,8 +34,9 @@ public class MainActivity extends AppCompatActivity {
     DatabaseHelper mDatabaseHelper;
     private Button btnAdd, btnViewData, btnSearch;
     private EditText editText;
-    private TextView textViewResult;
+    private TextView textViewResult, searchingWord;
     private NestedScrollView scrollView;
+
 
 
     @Override
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         btnViewData = (Button) findViewById(R.id.btnView);
         btnSearch = (Button) findViewById(R.id.btnSearch);
         textViewResult = findViewById(R.id.text_view_result);
+        searchingWord = findViewById(R.id.searchingParameter);
         scrollView = findViewById(R.id.nestedScrollView);
 
         mDatabaseHelper = new DatabaseHelper(this);
@@ -60,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 String inputWord = editText.getText().toString();
                 System.out.println("input paramter " + editText.getText().toString());
                 System.out.println("input paramter " + inputWord);
+
+                searchingWord.setText(inputWord);
 
                 JsonPlaceHolderApi jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
                 Call<ResponseBody> call = jsonPlaceHolderApi.getStringResponse2(inputWord);
@@ -86,44 +93,81 @@ public class MainActivity extends AppCompatActivity {
                             JSONArray jsonArray = (JSONArray) jsonArray2.getJSONObject(0).get("phonetics");
                             JSONArray jsonArrMeanings = (JSONArray) jsonArray2.getJSONObject(0).get("meanings");
 
+                            System.out.println("size meanings");
+                            System.out.println(jsonArrMeanings.length());
+                            System.out.println("size meanings");
+
                             System.out.println("Phonetics ---> text " + jsonArray.getJSONObject(0).get("text"));
                             System.out.println("Meanings ---> partOfSpeech " + jsonArrMeanings.getJSONObject(0).get("partOfSpeech"));
                             System.out.println("Meanings ---> definitions " + jsonArrMeanings.getJSONObject(0).get("definitions"));
                             // System.out.println("" + jsonArray.getJSONObject(0).get("text"));
-//
+                            //
                             JSONArray jsonArrMeaningsDefinitions = (JSONArray) jsonArrMeanings.getJSONObject(0).get("definitions");
 
                             System.out.println("length of jsonArraymeinanig definitions is " + jsonArrMeaningsDefinitions.length());
                             int lengthOfDefinitions = jsonArrMeaningsDefinitions.length();
 
 
+                            JSONObject jsonObject2 = new JSONObject();
+                            JSONArray jsonArray1 = new JSONArray();
+                            List<JSONObject> list = new ArrayList<>();
+                            Object[] ArrayObject = new Object[lengthOfDefinitions];
 
-                            // todo potrebne osetrit  ci mame string alebo je to prazdne ,, osetrenie chyby
+
+
+                            //
                             for (int i = 0; i < lengthOfDefinitions; i++) {
+                                JSONObject jsonObject = new JSONObject();
                                 System.out.println("-------------------------------------");
-                                System.out.println("-- Definition  [" + i +"]" +jsonArrMeaningsDefinitions.getJSONObject(i).get("definition"));
-                                System.out.println("-- Example  [" + i +"]" +jsonArrMeaningsDefinitions.getJSONObject(i).get("example"));
+                                System.out.println("dlzka " + jsonArrMeaningsDefinitions.getJSONObject(i).get("definition").toString().length());
+                                //  int number = ;
+                                if (!jsonArrMeaningsDefinitions.getJSONObject(i).isNull("definition")) {
+
+                                    jsonObject.put("Definition", jsonArrMeaningsDefinitions.getJSONObject(i).get("definition"));
+                                    System.out.println("-- Definition  [" + i + "]" + jsonArrMeaningsDefinitions.getJSONObject(i).get("definition"));
+                                    System.out.println("number is bigger than 10");
+                                }
+
+                                if (!jsonArrMeaningsDefinitions.getJSONObject(i).isNull("example")) {
+                                    jsonObject.put("Example", jsonArrMeaningsDefinitions.getJSONObject(i).get("example"));
+                                    System.out.println("dlzka " + jsonArrMeaningsDefinitions.getJSONObject(i).get("example").toString().length());
+                                    System.out.println("-- Example  [" + i + "]" + jsonArrMeaningsDefinitions.getJSONObject(i).get("example"));
+                                }
+                                if (!jsonArrMeaningsDefinitions.getJSONObject(i).isNull("synonyms")) {
+                                    //JSONArray jsonArrSynonyms= (JSONArray) jsonArrMeanings.getJSONObject(0).get("synonyms");
+                                    System.out.println("synonyms");
+                                    System.out.println(jsonArrMeaningsDefinitions.getJSONObject(i).get("synonyms"));
+
+                                }
                                 System.out.println("-------------------------------------");
+                                System.out.println("vklad poziciiu " +i);
+                                System.out.println(jsonObject);
+                                list.add(jsonObject);
+                                ArrayObject[i] = jsonObject;
+
+                                System.out.println(jsonObject);
+                                jsonArray1.put(jsonObject);
+                                System.out.println("=========================================");
+                                System.out.println(jsonArray1);
+                                System.out.println(jsonArray1.getJSONObject(0));
+
+                                System.out.println("=========================================");
                             }
 
 
-/*
-                            System.out.println(" json Arrmeaing Definitions one " + jsonArrMeaningsDefinitions.getJSONObject(1));
-                            System.out.println(" json Arrmeaing Definitions one " + jsonArrMeaningsDefinitions.getJSONObject(1).toString());
-                            System.out.println(" is null one " + jsonArrMeaningsDefinitions.getJSONObject(1).isNull("definition"));
-                            System.out.println(" definition one  " + jsonArrMeaningsDefinitions.getJSONObject(1).get("definition"));
-*/
+                            System.out.println("result " + jsonArray1);
+                            System.out.println("list " + list);
 
 
-                            /*System.out.println("=====================================================");
-                            System.out.println(" Definitions zero " + jsonArrMeaningsDefinitions.getJSONObject(0).get("definition"));
-                            System.out.println("Example zero" + jsonArrMeaningsDefinitions.getJSONObject(0).get("example"));
-                            System.out.println("=====================================================");
+                            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!");
 
-                            System.out.println("  Definitions one " + jsonArrMeaningsDefinitions.getJSONObject(1).get("definition"));
-                            System.out.println("  example one " + jsonArrMeaningsDefinitions.getJSONObject(1).get("example"));
-                            */
-                            textViewResult.setText(jsonArray2.toString());
+                            for (int i = 0; i < ArrayObject.length; i++) {
+                                System.out.println(ArrayObject[i]);
+                            }
+
+                            //textViewResult.setText(jsonArray2.toString());
+
+                            textViewResult.setText(list.toString());
 
                         } catch (JSONException | IOException e) {
                             e.printStackTrace();
